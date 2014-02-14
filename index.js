@@ -27,35 +27,24 @@ function Driver(opts,app) {
   
   //State device
   function PresenceStateDevice() {
-  	this.readable = true;
-  	this.writeable = true;
-  	this.V = 0;
-  	this.D = 244; //Generic state device
-  	this.G = "presence";
-  	var device = this;
-  	
-  	this._states = ['NobodyHome','SomeoneHome','EveryoneHome'];
-  	
-  }  
+    this.readable = true;
+    this.writeable = true;
+    this.V = 0;
+    this.D = 244; //Generic state device
+    this.G = "presence";
+    var device = this;
+  };
   util.inherits(PresenceStateDevice,stream);
   
-  PresenceStateDevice.prototype.actuateState = function(newState) {
-  	if(!this._state || this._state != newState){
-  		self.writeToLog('Presence => State changed from '+ this._state + ' to '+newState);
-  		this._state = newState;
-  		this.emit('data',newState);
-  	}
+  PresenceStateDevice.prototype.actuateState = function(data) {
+    self.writeToLog('Presence => Devices online: '+data);
+    this.emit('data',data);
   };
   
   PresenceStateDevice.prototype.write = function(data) {
-  	if(this._states.contains(data))
-  	{
-  		this.actuateState(data);
-  		return true;
-  	} else {
-  		return false;
-  	}
-  }
+    this.actuateState(data);
+    return true;
+  };
   
   //Used an array, in case more sub devices need to be added.
   this.subDevices = {
@@ -136,24 +125,13 @@ Driver.prototype.see = function(entity) {
 };
 
 Driver.prototype.sendPresenceState = function(){
-	var self = this;
-	
-	//Get the number of objects in the timeout list.
-  	//Device get added and removed by the ninja-presence-base driver
-  	var currentOnlineHosts = Object.keys(self._timeouts).length;
-  	self.writeToLog('Presence => Number devices online: ' + currentOnlineHosts);
-  	self.writeToLog('Presence => All devices',self._allDevices);
-  	
-  	if(currentOnlineHosts == 0) // 0 devices in the timeout list = Nobody home
-	{
-		self.subDevices.presenceState.actuateState(self.subDevices.presenceState._states[0]);
-	} else if( currentOnlineHosts == Object.keys(self._allDevices).length) // All devices ever seen are online
-	{
-		self.subDevices.presenceState.actuateState(self.subDevices.presenceState._states[2]);
-	} else  //There are less devices in the timeout array then devices ever seen
-	{
-		self.subDevices.presenceState.actuateState(self.subDevices.presenceState._states[1]);
-	}
+  var self = this;
+  
+  //Get the number of objects in the timeout list.
+  //Device get added and removed by the ninja-presence-base driver
+  var currentOnlineHosts = Object.keys(self._timeouts).length;
+  self.writeToLog('Presence => Number devices online: ' + currentOnlineHosts);
+  self.subDevices.presenceState.actuateState(currentOnlineHosts);
 }
 
 Driver.prototype.writeToLog = function(s) {
