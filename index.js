@@ -48,10 +48,8 @@ function Driver(opts,app) {
   
   //Used an array, in case more sub devices need to be added.
   this.subDevices = {
-  	presenceState : new PresenceStateDevice()
+    presenceState : new PresenceStateDevice()
   };
-  
-  
 
   app.on('client::up',function(){
     if (!self.G) {
@@ -67,9 +65,9 @@ function Driver(opts,app) {
     self.emit('register', self);
     //Register subdevice
     Object.keys(self.subDevices).forEach(function(id) {
-		self._app.log.info('Adding sub-device', id, self.subDevices[id].G);
-		self.emit('register', self.subDevices[id]);
-	});
+      self._app.log.info('Adding sub-device', id, self.subDevices[id].G);
+      self.emit('register', self.subDevices[id]);
+    });
     
     if (self.save) {
       self.save(); // May not be there in the test harness
@@ -80,8 +78,6 @@ function Driver(opts,app) {
     if (self.scan) {
       self.startScanning();
     }
-    
-    
   });
 
 }
@@ -89,8 +85,8 @@ function Driver(opts,app) {
 Driver.prototype.startScanning = Driver.prototype.scanComplete = function() {
   var self = this;
   setTimeout(function() {
-      self._app.log.debug('Scanning');
-      self.scan();
+    self._app.log.debug('Scanning');
+    self.scan();
   }, this._opts.scanDelay);
 };
 
@@ -105,7 +101,7 @@ Driver.prototype.see = function(entity) {
   }
   
   if(!self._allDevices[entity.id]) {
-  	self._allDevices[entity.id] = true;
+    self._allDevices[entity.id] = true;
   }
 
   if (!_.isEqual(this._opts.lastValue[entity.id], entity)) {
@@ -114,10 +110,10 @@ Driver.prototype.see = function(entity) {
   }
 
   self._timeouts[entity.id] = setTimeout(function() {
-      entity.present = entity['new'] = false;
-      self.emit('data', entity);
-      delete(self._timeouts[entity.id]);
-      self.sendPresenceState(); //after removing the entity from the timeout the state should change.
+    entity.present = entity['new'] = false;
+    self.emit('data', entity);
+    delete(self._timeouts[entity.id]);
+    self.sendPresenceState(); //after removing the entity from the timeout the state should change.
   }, this._opts.timeout);
   
   //We have seen a device, so the state could be updated.
@@ -135,10 +131,9 @@ Driver.prototype.sendPresenceState = function(){
 }
 
 Driver.prototype.writeToLog = function(s) {
-	if(this._opts.logging) {
-		this._app.log.info(arguments);
-	}
-
+  if(this._opts.logging) {
+    this._app.log.info(arguments);
+  }
 }
 
 module.exports = Driver;
