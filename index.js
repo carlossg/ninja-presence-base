@@ -16,8 +16,9 @@ function Driver(opts,app) {
 
   opts.timeout = opts.timeout || 1000 * 60 ;
   opts.scanDelay = opts.scanDelay || 10000;
-  
-  this._opts.logging = this._opts.logging || true; //Logging is on by default
+
+  if (this._opts.logging != null)
+    self._app.log.opts.debug = false;
 
   this._timeouts = {};
   opts.lastValue = opts.LastValue || {};
@@ -37,7 +38,7 @@ function Driver(opts,app) {
   util.inherits(PresenceStateDevice,stream);
   
   PresenceStateDevice.prototype.actuateState = function(data) {
-    self.writeToLog('Presence => Devices online: '+data);
+    self._app.log.info('Presence => Devices online: '+data);
     this.emit('data',data);
   };
   
@@ -126,7 +127,7 @@ Driver.prototype.sendPresenceState = function(){
   //Get the number of objects in the timeout list.
   //Device get added and removed by the ninja-presence-base driver
   var currentOnlineHosts = Object.keys(self._timeouts).length;
-  self.writeToLog('Presence => Number devices online: ' + currentOnlineHosts);
+  this._app.log.debug('Presence => Number devices online: ' + currentOnlineHosts);
   self.subDevices.presenceState.actuateState(currentOnlineHosts);
 }
 
