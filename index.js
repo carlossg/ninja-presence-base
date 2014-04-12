@@ -38,7 +38,7 @@ function Driver(opts,app) {
   util.inherits(PresenceStateDevice,stream);
   
   PresenceStateDevice.prototype.actuateState = function(data) {
-    self._app.log.info('Presence => Devices online: '+data);
+    self._app.log.debug('Presence => Devices online: '+data);
     this.emit('data',data);
   };
   
